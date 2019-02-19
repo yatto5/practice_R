@@ -1,0 +1,72 @@
+---
+title: "sample_rmd"
+author: "yatto5"
+date: '`r format(Sys.time(), "%y/%m/%d %H:%M")`'
+output: 
+  html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(ggplot2)
+library(reshape2)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, message = FALSE)
+options(width = 1000)
+
+```
+
+# 概要
+
+アヤメのガクと花弁のサイズにより種の分類をおこなった結果を報告します。 
+
+# *`iris`*データについて
+
+- データ取得日時：1935年
+- データ取得場所：Gaspé Peninsula，カナダ
+- データ取得者：エドガーアンダーソン博士
+
+## データ形式
+
+```{r}
+ kable(head(iris))
+```
+
+## 記述統計量など
+平均、最小、最大などです。
+
+```{r}
+summary(iris)
+```
+
+#種ごとの花びらサイズプロット
+3種類のアヤメごとに大きさを箱ひげ図で可視化しました。
+
+```{r}
+d = melt(iris)
+ggplot(d,aes(Species, value)) + geom_boxplot() + facet_wrap(~variable)
+```
+
+# SVMによる分類
+
+サポートベクターマシンによる分類結果を可視化しました。
+
+```{r}
+library(e1071) # ライブラリの読み込み
+m = svm(Species ~., data = iris)
+pair = combn(1:4,2)
+for (i in 1:ncol(pair)){
+  i1 = pair[1, i]; i2 = pair[2, i]
+  o = setdiff(1:4, c(i1, i2))
+  fml = as.formula(paste0(names(iris)[i1],"~",names(iris)[i2]))
+  slice = list(mean(iris[[o[1]]]), mean(iris[[o[2]]]))
+  names(slice) = names(iris)[o]
+  plot(m, iris, fml, slice = slice)
+}
+```
+
+# 結論
+アヤメのガクと花弁のサイズによる種の分類を行いました。
+いいと思います。
+
+# 参考・記述元
+[R Markdownで楽々レポートづくり](http://gihyo.jp/admin/serial/01/r-markdown/)

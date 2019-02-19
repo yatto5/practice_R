@@ -1,0 +1,9 @@
+base
+knitr
+ggplot2
+reshape2
+e1071
+zoo
+xts
+TTR
+quantmod

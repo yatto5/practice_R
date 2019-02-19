@@ -1,0 +1,14 @@
+---
+title: "test_include"
+author: "yatto5"
+date: "2019年2月19日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("quantmod")
+```
+
+```{r child="test_come_chart.Rmd"}
+```

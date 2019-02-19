@@ -1,0 +1,31 @@
+---
+title: "test_come_chart"
+author: "yatto5"
+date: "2019年2月19日"
+output: html_document
+---
+
+```{r setup_come_chart, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("quantmod")
+```
+
+```{r}
+wd <- getwd()
+if (regexpr("app$",wd)<0){
+  setwd("./app")
+}
+df <- read.csv("3543_2019.csv",header=T, skip = 1)
+colnames(df) <- c("Date", "Open", "High", "Low", "Close")
+list <- df[,c(1,2,3,4)]
+list2 <- data.frame(t(list))
+colnames(list2) <- rownames(list)
+
+comeda_xts <- as.xts(read.zoo(df))
+chartSeries(
+  comeda_xts,
+  subset = "2019-01",
+  type = "candlesticks"
+)
+
+```

@@ -1,0 +1,57 @@
+---
+title: "sample_fx"
+author: "yatto5"
+date: '`r format(Sys.time(), "%y/%m/%d %H:%M")`'
+output: 
+  html_document
+---
+
+```{r setup, include=FALSE}
+#chank
+library(quantmod)
+library(forecast)
+
+#通過ペア
+target = c("USD/JPY", "EUR/JPY", "GBP/JPY", "THB/JPY")
+
+#過去120日分のレート取得
+getFX(target, from = Sys.Date() - 120)
+#save(EURJPY, USDJPY, GBPJPY, THBJPY, file = paste0("fx-", Sys.Date(), ".Rda"))
+
+```
+
+# USD/EUR/GBP/THB対円の為替レート
+
+- 左の図は過去120日の為替変動を示しています。
+- 右の図は過去30日の為替変動と今後30日の為替変動予測を示しています。
+- 右の図のグレイ網掛け部分は予測の信頼区間を示します。
+
+```{r fig.height=14, echo=FALSE}
+# 左に現在まで，右にforecast()による予測を含めてプロットします
+par(mfrow=c(4,2), xpd = TRUE)
+minp = list()
+maxp = list()
+for (tar in target){
+  #plot for now
+  print(do.call(chart_Series, list(as.name(sub("/", "", tar)), pars = list(cex = 0.5, mar = c(4,2,2,2), xpd = TRUE))))
+  
+  # model ARIMA
+  m = do.call(auto.arima, list(as.name(sub("/", "", tar))))
+  
+  # plot by forecast
+  p = forecast(m, 30)
+  plot(p, 30)
+  
+  #good day
+  minp[[tar]] = which.min(p$mean)
+  maxp[[tar]] = which.max(p$mean)
+}
+```
+
+# いつ両替すべきか
+これは~~とりけし~~でこれは`文字通の~~出力~~`で上付き下付きn_p_^10^など。
+
+```{r, results='asis', echo=FALSE}
+for (tar in target){
+  cat("- ", tar, "は", format(Sys.Date()+minp[[tar]]), "に両替するのがおとくで、", format(Sys.Date() + maxp[[tar]]), "はだめです。\n")
+}
